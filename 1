@@ -1,0 +1,31 @@
+import pandas as pd
+import openpyxl
+
+wb_a = openpyxl.load_workbook(r'E:\Desktop\1.xlsx')
+sheet_a = wb_a.active
+
+wb_b = openpyxl.load_workbook(r'E:\Desktop\2.xlsx')
+sheet_b = wb_b.active
+
+dic1 = {}
+for cell in sheet_a['A']:
+    if cell.value:
+        dic1[cell.value] = []
+
+dic2 = {}
+
+for col_idx in range(1, sheet_b.max_column + 1):
+    col_values = sheet_b[f'{openpyxl.utils.get_column_letter(col_idx)}']
+    col_name = col_values[0].value
+    
+    if col_name in dic1.keys():
+        # Iterate over the values in the column
+        for row_idx, cell in enumerate(col_values[1:], start=2):
+            if cell.value in dic1[col_name]:
+                
+                dic2.setdefault(col_name, row_idx)
+                break
+
+df = pd.DataFrame.from_dict(dic2, orient='index', columns=['Row'])
+df.index.name = 'Disease'
+df.to_excel(r'E:\Desktop\data1.xlsx')
